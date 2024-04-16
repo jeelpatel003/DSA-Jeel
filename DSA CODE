@@ -1,0 +1,77 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_SIZE 100
+
+typedef struct {
+    int priority;
+    int patientID;
+} Patient;
+
+typedef struct {
+    Patient data[MAX_SIZE];
+    int size;
+} PriorityQueue;
+
+void initQueue(PriorityQueue *queue) {
+    queue->size = 0;
+}
+
+void enqueue(PriorityQueue *queue, int priority, int patientID) {
+    if (queue->size >= MAX_SIZE) {
+        printf("Queue is full. Cannot enqueue.\n");
+        return;
+    }
+
+    Patient newPatient = {priority, patientID};
+    int i = queue->size - 1;
+    while (i >= 0 && queue->data[i].priority < priority) {
+        queue->data[i + 1] = queue->data[i];
+        i--;
+    }
+    queue->data[i + 1] = newPatient;
+    queue->size++;
+}
+
+Patient dequeue(PriorityQueue *queue) {
+    if (queue->size <= 0) {
+        printf("Queue is empty. Cannot dequeue.\n");
+        exit(1);
+    }
+
+    Patient removedPatient = queue->data[queue->size - 1];
+    queue->size--;
+    return removedPatient;
+}
+
+void displayQueue(PriorityQueue *queue) {
+    if (queue->size <= 0) {
+        printf("Queue is empty.\n");
+        return;
+    }
+
+    printf("Priority Queue:\n");
+    for (int i = 0; i < queue->size; i++) {
+        printf("Priority: %d, Patient ID: %d\n", queue->data[i].priority, queue->data[i].patientID);
+    }
+}
+
+int main() {
+    PriorityQueue emergencyQueue;
+    initQueue(&emergencyQueue);
+
+    enqueue(&emergencyQueue, 2, 101);
+    enqueue(&emergencyQueue, 1, 102);
+    enqueue(&emergencyQueue, 3, 103);
+    enqueue(&emergencyQueue, 1, 104);
+    enqueue(&emergencyQueue, 2, 105);
+
+    displayQueue(&emergencyQueue);
+
+    Patient nextPatient = dequeue(&emergencyQueue);
+    printf("\nDequeued: Priority: %d, Patient ID: %d\n", nextPatient.priority, nextPatient.patientID);
+
+    displayQueue(&emergencyQueue);
+
+    return 0;
+}
